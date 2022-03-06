@@ -50,6 +50,7 @@
 <h2><span id="遇到的一些问题">遇到的一些问题</span></h2><p><a href="https://blog.csdn.net/qq_44852901/article/details/122817214">Archieve 无法打开解决办法</a></p>
 <p><a href="https://www.zhihu.com/question/353097489">Cannot GET /about/%20 解决办法</a></p>
 <p><a href="https://www.cnblogs.com/Createsequence/p/14150758.html">目录无法跳转</a></p>
+<h2><span id="仍未解决的问题">仍未解决的问题</span></h2><p>hexo目录如果同时有一级目录以及二级目录，只能显示一级目录</p>
 ]]></content>
       <tags>
         <tag>建站</tag>
