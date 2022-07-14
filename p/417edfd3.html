@@ -81,17 +81,17 @@
 
 
 
-<meta name="description" content="前言埋点数据是大部分互联网公司数据组的重要数据来源，另一个重要来源是业务数据。一般埋点数据体量要比业务数据大很多。正式因为海量的埋点数据，对用户行为的分析，精准推荐才成为了可能， 本文对目前所见的埋点数据上报架构进行了梳理，并分析其优缺点。 数据上报架构第一种这种方式全部埋点数据都打往一个topic，所有的埋点共用一套schema，这个schema中包括了公共字段，以及自定义字段，公共字段又可以分">
+<meta name="description" content="前言埋点数据是大部分互联网公司数据组的重要数据来源，另一个重要来源是业务数据。从数据量上来讲，埋点数据量级要比业务数据大很多。正是因为有海量的埋点数据，用户行为分析，精准推荐才成为了可能， 本文对目前所见的埋点数据上报架构进行了梳理，并分析其优缺点。 数据上报架构第一种这种方式全部埋点数据都打往一个topic，所有的埋点共用一套schema，这个schema中包括了公共字段，以及自定义字段，公共字">
 <meta property="og:type" content="article">
 <meta property="og:title" content="埋点数据上报架构比较">
 <meta property="og:url" content="https://blog.eightbrother.top/p/417edfd3.html">
 <meta property="og:site_name" content="八哥写字的地方">
-<meta property="og:description" content="前言埋点数据是大部分互联网公司数据组的重要数据来源，另一个重要来源是业务数据。一般埋点数据体量要比业务数据大很多。正式因为海量的埋点数据，对用户行为的分析，精准推荐才成为了可能， 本文对目前所见的埋点数据上报架构进行了梳理，并分析其优缺点。 数据上报架构第一种这种方式全部埋点数据都打往一个topic，所有的埋点共用一套schema，这个schema中包括了公共字段，以及自定义字段，公共字段又可以分">
+<meta property="og:description" content="前言埋点数据是大部分互联网公司数据组的重要数据来源，另一个重要来源是业务数据。从数据量上来讲，埋点数据量级要比业务数据大很多。正是因为有海量的埋点数据，用户行为分析，精准推荐才成为了可能， 本文对目前所见的埋点数据上报架构进行了梳理，并分析其优缺点。 数据上报架构第一种这种方式全部埋点数据都打往一个topic，所有的埋点共用一套schema，这个schema中包括了公共字段，以及自定义字段，公共字">
 <meta property="og:locale">
 <meta property="og:image" content="https://blog.eightbrother.top/p/417edfd3/1.jpg">
 <meta property="og:image" content="https://blog.eightbrother.top/p/417edfd3/2.jpg">
 <meta property="article:published_time" content="2022-07-13T13:16:52.000Z">
-<meta property="article:modified_time" content="2022-07-13T15:18:35.036Z">
+<meta property="article:modified_time" content="2022-07-14T15:11:50.361Z">
 <meta property="article:author" content="zhangfangkai">
 <meta property="article:tag" content="大数据">
 <meta name="twitter:card" content="summary">
@@ -363,7 +363,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  929
+                  970
                 </span>
               
 
@@ -400,7 +400,7 @@
       
 
       
-        <h2><span id="前言">前言</span></h2><p>埋点数据是大部分互联网公司数据组的重要数据来源，另一个重要来源是业务数据。一般埋点数据体量要比业务数据大很多。正式因为海量的埋点数据，对用户行为的分析，精准推荐才成为了可能， 本文对目前所见的埋点数据上报架构进行了梳理，并分析其优缺点。</p>
+        <h2><span id="前言">前言</span></h2><p>埋点数据是大部分互联网公司数据组的重要数据来源，另一个重要来源是业务数据。从数据量上来讲，埋点数据量级要比业务数据大很多。正是因为有海量的埋点数据，用户行为分析，精准推荐才成为了可能， 本文对目前所见的埋点数据上报架构进行了梳理，并分析其优缺点。</p>
 <h2><span id="数据上报架构">数据上报架构</span></h2><h3><span id="第一种">第一种</span></h3><p>这种方式全部埋点数据都打往一个topic，所有的埋点共用一套schema，这个schema中包括了公共字段，以及自定义字段，公共字段又可以分为必选字段和可选字段，某些必选字段是打点的sdk自动获取值，不需要用户去指定值；自定义字段塞在一个map中，并且规定，该map中只能存储&lt;string, string&gt;类型，上报的架构大概如下：</p>
 <p><img src="/p/417edfd3/1.jpg"></p>
 <p>上报时候所有的数据都会上报到同一个kafka topic中，这个kafka分区会很多，用flink消费该topic落盘到hive，这个flink任务会有很大的并行度，这样一来只用维护一个flink任务就可以，如果新增打点，不用修改该flink任务，当打点数量太多的时候，需要对该kafka topic进行扩容，增加flink任务并行度，扩容时会影响所有的事件上报，罗盘到hive因为是flink任务，所以是实时写入，但是只有该小时全部落盘后才会提交分区，因此相当于小时级别延迟</p>
@@ -448,7 +448,13 @@
 </tr>
 </tbody></table>
 <p>一般而言，第一种比较适合于数据量小的场景，第二种适合大数据量场景</p>
-<p><strong>tips</strong>:一般上报字段建议命名使用下划线命名，避免驼峰命名，由于hive对大小写不敏感，驼峰命名很多时候容易出问题</p>
+<p><strong>tips</strong>:</p>
+<ul>
+<li><p>一般上报字段建议命名使用下划线命名，避免驼峰命名，由于hive对大小写不敏感，驼峰命名很多时候容易出问题</p>
+</li>
+<li><p>埋点事件的schema建议尽量简单，避免复杂类型，否则在序列化反序列化过程中会很影响性能。</p>
+</li>
+</ul>
 
       
     </div>
