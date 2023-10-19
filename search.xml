@@ -111,8 +111,197 @@
 </li>
 </ul>
 ]]></content>
+      <categories>
+        <category>大数据</category>
+      </categories>
       <tags>
         <tag>大数据</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>面试记录</title>
+    <url>/p/8e14516.html</url>
+    <content><![CDATA[<h1><span id="前言">前言</span></h1><p>记录一些面试的过程，以备之后学习~</p>
+<blockquote>
+<p> 自我介绍</p>
+<p> 面试官您好，我叫*<strong>，硕士毕业2年，有两年的数据测试工作经验，目前在</strong>部门。下面介绍一下我的工作经历和项目经历：</p>
+</blockquote>
+<ol>
+<li>负责配送离线数仓的测试，保障指标计算的正确性</li>
+<li>负责加盟商奖惩、加盟商权益、运力目标等系统的测试，保障基础数据、指标计算、系统配置页面及配置存储、基于配置化的计算正确性</li>
+<li>负责骑手端数据的服务和实时数仓、离线数仓的测试，保障数据正确性和一致性</li>
+<li>负责大数据测试平台的开发，主要是实现实时数据-离线数据、离线数据-离线数据的一致性对比功能</li>
+<li>负责异常平台的开发，主要是实现前端的搭建及模块化的开发</li>
+</ol>
+<blockquote>
+<p>给定一个需求，离线数仓生产：发单量、完单量、取消单量、取消率，服务计算这几个指标的同环比，前端展示这几个指标以及这几个指标的同环比，如何进行测试？</p>
+</blockquote>
+<h3><span id="离线数仓的测试">离线数仓的测试</span></h3><ol>
+<li>先从需求层面审查 prd。首先，进行高层次审查。抛开 pm、prd本身，思考需求的合理性，指标的合理性；其次，研究现有的标准和规范。参照数仓已有指标定义，口径，审核指标合理性。包括：新增指标是否符合之前类似指标定义逻辑、已有指标是否和原来口径定义完全一致；根据行业标准，审查指标定义的合理性。然后，对 prd 进行低层次审查，指标定义是否清晰、完成、准确、贴切、合理、代码无关、可测试性。</li>
+<li>在技术方案阶段，审查技术方案。首先，检查需求列表、指标列表和指标定义是否与 prd 一致，避免需求遗漏和口径不一致，其次，了解技术架构的设计，需求被拆分成哪些模块，模块之间如何联系，数据的上下游是什么，是否符合产品预期，检查数据字典是否完整（表、字段、数据类型、长度、索引、约束），准确（与具体的实现逻辑一致），明确（清楚的描述每个数据字段的含义、来源、使用方式）等。最后，确认监控方案是否合理，合理的监控方式应该包含：字段监控，确保记录重复、字段关联失败、错误值等问题能被及时发现；指标监控，监控关键指标的变动情况，确保系统性问题、上游问题能被及时发现；上游数据 diff 监控，对比我们产出的数据和上游数据的差异，监控我们的加工结果符合预期。</li>
+<li>在测试阶段，分为白盒测试和黑盒测试两个部分。白盒测试：<br>3.1  检查代码是否符合规范：可靠性、可读性、可维护性<br>3.2 检查表的描述、用途，使用场景书写清晰<br>3.3 检查表结构和字段定义是否完整<br>3.4 检查加工计算的处理逻辑是否正确<br>3.5 检查分支判定的逻辑正确性，逻辑分支是否互斥？是否有优先级顺序？<br>3.6 检查 null 值、空值、零值是否做了兼容性处理<br>3.7 检查字段类型定义是否与上游一致，是否与需求一致<br>黑盒测试<br>3.8 宏观检查，整体数据量对比、枚举值分布、字段异常值检测<br>3.9 微观检查，字段正确性检查：是否串列、类型是否正确是否丢失精度<br>3.10根据加工逻辑和可测性，选择是通过划分场景和边界抽样验证还是通过写验证 sql 来验证</li>
+<li>编写测试报告，报告的内容包括：表名、字段名、字段加工逻辑及数值类型，验证的过程数据、验证的结果。</li>
+</ol>
+<h3><span id="服务端测试">服务端测试</span></h3><ol start="5">
+<li>验证能够正确获取到数仓产出数据。</li>
+<li>单元测试：验证各个同环比数据能够被正确的计算出来，我们可以通过手动的计算一部分数据，与服务端计算的数据作对比</li>
+<li>集成测试：在所有模块都通过测试之后，进行集成测试，确保各个模块正确的协同工作，比如：取消率是由正确的取消单量和发单量计算出来的</li>
+<li>性能测试：模拟大批量的数据，测试服务器在高负载下的性能，包括计算速度和稳定性</li>
+<li>异常处理测试：输入一些异常的数据，比如缺失的数据、字段类型错误的数据，测试服务端能正确的处理这些场景</li>
+<li>权限测试：保证数据不会被非法访问</li>
+</ol>
+<h3><span id="前端测试">前端测试</span></h3><ol>
+<li>前端是否与 ui 设计一致</li>
+<li>每个功能模块能正常工作，能正确展示服务端提供的数据</li>
+<li>兼容性测试：检查前端是否在所有支持的浏览器和设备上都能正常工作</li>
+<li>性能测试：检查页面加载速度，以及在处理大量数据时是否仍能保持良好的性能</li>
+<li>用户体验测试：通过用户反馈或者使用者体验，检查前端是否易于使用，是否符合用户的使用习惯</li>
+</ol>
+<blockquote>
+<p>写一个 hive sql，计算发单量的同环比<br>环比：10月-9月/9月</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">select</span><br><span class="line"> month,</span><br><span class="line">       case when lag(waybill_num,1) over (order by month)&#x3D;0 then null</span><br><span class="line">            else (waybill_num-lag(waybill_num,1) over (order by month))&#x2F;lag(waybill_num,1) over (order by month)</span><br><span class="line">             end as yay</span><br><span class="line">  from (</span><br><span class="line">        select substring(time,1,6) as</span><br><span class="line">         month,</span><br><span class="line">               count(waybill_id) as waybill_num</span><br><span class="line">          from table</span><br><span class="line">         group by substring(time,1,6)</span><br><span class="line">       )</span><br><span class="line"> order by</span><br><span class="line"> month</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>数仓中的事实表的类型？</p>
+</blockquote>
+<ol>
+<li>事务事实表：每行的数据代表一个业务事件，比如一次下单，粒度比较细</li>
+<li>周期快照事实表：在每一个固定的时间周期，比如每天、每月，记录一次数据，反映周期内的业务状态，比如创建一个每天库存快照事实表，记录当前的库存状态</li>
+<li>累积快照事实表：用于记录业务过程的整个阶段，比如创建一个订单累积快照事实表，记录订单从创建、支付、发货、收货的各个阶段</li>
+</ol>
+<blockquote>
+<p>排名的开窗函数有哪些？</p>
+</blockquote>
+<ol>
+<li>row_number 每行有唯一的排序，即使排名相同，序号也不同</li>
+<li>rank相同排名的序号相同，1，1，3</li>
+<li>dense_rank有相同的排名时，下一行的序号与上一行连续，1，1，2</li>
+<li>percent_rank计算排名的百分比</li>
+<li>cume_dist计算排名的累积百分比</li>
+</ol>
+<blockquote>
+<p>介绍一下奖惩系统，包括系统结构、数据流向、怎么测试</p>
+</blockquote>
+<ol>
+<li><p>业务含义：奖惩系统是对<strong>加盟站</strong>进行<strong>奖励</strong>和<strong>惩罚</strong>考核的系统，它通过<strong>考核方案</strong>来对站点进行<strong>评分和评星</strong>，并通过评价结果计算站点的<strong>奖励和惩罚金额</strong></p>
+</li>
+<li><p>系统上下游：</p>
+<ul>
+<li>源数据：运单、判责、评价等系统获取完单、取消单、不满意单、虚假单、违规等数据</li>
+<li>数仓加工：产出运单表，包括骑手信息、站点信息，以及是否完成单、取消单、超时单等数据；产出站点表：站点信息、站点归属信息、站点月完单量、站点的一系列标签等</li>
+<li>下游：结算系统</li>
+</ul>
+</li>
+<li><p>数据生产流程</p>
+<p>3.1 数据层：基础数据，包括黑白名单、站点主从关系、奖励方案、其他业务上传数据比如黑白名单这些；上游数据：数据组和客诉单系统（mysql–&gt;hive）；结果数据：计算层返回的计算结果<br>3.2 计算层：spark 程序：用业务系统的数据对数据组给出的数据做一些过滤、聚合、补充； java 程序：将 spark 处理后的数据，计算评分、评星和奖励，最终得出来的结果，存在 mysql<br>3.3 调度层：在跑数日，人工的发起一个 hope 任务，也就是给程序发一个 kafka 消息，消费者监听到整个消息之后便会执行计算任务。crane定时任务主要用在奖惩方案和运营规则的状态变更<br>3.4 业务层：即奖惩系统的管理端部分，它包括admin端、thrift端和server端。主要提供了方案管理、站点管理和结果管理三个作用。方案管理主要是对考核方案的增删改查等配置，站点管理作用是管理站点和考核方案的绑定关系<br>3.5 应用层：即烽火台的方案管理和评星方案结果展示部分，主要提供了运营人员和第三方人员与奖惩系统的一个交互界面</p>
+</li>
+<li><p>如何测试：</p>
+<ul>
+<li>数仓部分同上</li>
+<li>spark 计算部分：本身分为多个计算任务，每个计算任务都会产出一个临时的结果表，qa 按照 prd 自己写 sql 与 rd 结果比对</li>
+<li>java 程序计算：版本1：设计一些用例，手工的计算，与 rd 的结果对比，缺点就是因为业务逻辑比较复杂，手工可能出错，并且验证的数据量小，与真实的业务数据相差过大；版本2：qa 手工的实现计算逻辑，用真实数据测试，缺点是真实数据中可能存在意想不到的边界和异常情况，并且开发成本较大；版本3，在业务趋于稳定后，为了降低自动化用例开发成本，qa 设计自动化用例、构造数据来进行自动化测试。</li>
+<li>管理端测试：测试界面实现符合产品方案、方案能够配置正确、存储正确、权限正确、开发接口自动化用例，每天定时执行</li>
+</ul>
+</li>
+<li><p>关于评星算法的测试：</p>
+<p>5.1 基本功能测试：</p>
+<ul>
+<li>所有站点的总分都相同，但单量不同。预期结果是单量最高的站点被评为5星，单量最低的站点被评为1星。</li>
+<li>所有站点的单量都相同，但总分不同。预期结果是总分最高的站点被评为5星，总分最低的站点被评为1星。</li>
+</ul>
+<p>5.2 边界条件测试：</p>
+<ul>
+<li>只有一个站点。预期结果是这个站点被评为5星。</li>
+<li>所有站点的总分和单量都相同。预期结果是所有站点都被评为同样的星级。</li>
+</ul>
+<p>5.3 异常情况测试：</p>
+<ul>
+<li>站点的总分或单量为负数。预期结果是这个站点被排除出评星范围。</li>
+<li>站点的总分或单量为0。预期结果是这个站点被评为1星。</li>
+</ul>
+<p>5.4 5星评定门槛值测试：</p>
+<ul>
+<li>所有站点的单量总和的10%正好是某个站点的单量。预期结果是这个站点被评为5星。</li>
+<li>所有站点的单量总和的10%在两个站点的单量之间。预期结果是单量累加到达或超过门槛值的站点被评为5星。</li>
+</ul>
+<p>5.5 5星和4星界限测试：</p>
+<ul>
+<li>某站点的单量跨越了5星和4星的界限，且在5星的单量大于等于4星的单量。预期结果是这个站点被评为5星。</li>
+<li>某站点的单量跨越了5星和4星的界限，且在5星的单量小于4星的单量。预期结果是这个站点被评为4星，比这个站点得分高的第一个站点被评为5星。</li>
+</ul>
+<p>5.6 保1保5测试：</p>
+<ul>
+<li><p>所有站点的总分都相同，且都大于1星的门槛值。预期结果是得分最低的站点被设置为1星。</p>
+</li>
+<li><p>所有站点的总分都相同，且都小于5星的门槛值。预期结果是得分最高的站点被设置为5星。 </p>
+</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p>介绍一下数据对比平台的具体实现</p>
+</blockquote>
+<p>主要是实现了离线数据&lt;&gt;离线数据对比、离线数据&lt;&gt;实时数据的对比功能</p>
+<ol>
+<li>离线比离线：来源数据的加工逻辑&amp;&amp;目标表进行 sql 拼接，按照用户指定的维度作为关联键，其余字段作为对比键，用 presto 或者 hive 进行查询</li>
+<li>离线比实时：用户填写离线、实时数据的表名、关联键、对比键、指定一些筛选条件，离线用 presto 或者 hive 进行查询，实时数据存储在 es、doris、kafka 里面，根据不同的存储类型，我们查的时候是拼接了查询的条件，查 es 的时候转换为DSL，通过java 的客户端库来查；doris 的话，可以用过 jdbc 来连接，通过 sql 来查；kafka 的话可以通过 flink 来查。离线和实时的数据分别查出来之后，通过关联键关联，逐条对比需要对比的字段，把对不上的字段记录下来。</li>
+</ol>
+]]></content>
+      <categories>
+        <category>面试</category>
+      </categories>
+      <tags>
+        <tag>面试</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>mysql同步hive时io问题</title>
+    <url>/p/e5358cee.html</url>
+    <content><![CDATA[<h2><span id="背景">背景</span></h2><p>最近在做mysql同步hive的工作，之前用的是sqoop，想着sqoop是mr任务，效率应该比较低，所以想用spark jdbc去改造这个流程。使用spark jdbc去测试的时候发现，在表数据量比较多（6000W条）并且mysql表中含有<code>longtext</code>字段时，用spark jdbc读取的时候数据库的io突然上升，触发了dba侧的告警，而用sqoop则顺利同步，没有发现问题，对spark该问题进行了详细排查。</p>
+<h2><span id="spark-jdbc-原理">spark jdbc 原理</span></h2><p><a href="https://spark.apache.org/docs/latest/sql-data-sources-jdbc.html">spark jdbc</a>读取的源码可以参考 <a href="https://github.com/KinoMin/bigdata-learning-notes/blob/master/note/spark/Spark%E8%AF%BB%E5%8F%96JDBC%E6%95%B0%E6%8D%AE%E6%BA%90%E4%BC%98%E5%8C%96.md">Spark读取JDBC数据源</a></p>
+<p>根据spark jdbc的源码，在读取的时候会走到<code>JdbcRelationProvider.createRelation()</code>中来，如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">override def createRelation(</span><br><span class="line">    sqlContext: SQLContext,</span><br><span class="line">    parameters: Map[String, String]): BaseRelation &#x3D; &#123;</span><br><span class="line">  val jdbcOptions &#x3D; new JDBCOptions(parameters)</span><br><span class="line">  val resolver &#x3D; sqlContext.conf.resolver</span><br><span class="line">  val timeZoneId &#x3D; sqlContext.conf.sessionLocalTimeZone</span><br><span class="line">  &#x2F;&#x2F; 获取schema</span><br><span class="line">  val schema &#x3D; JDBCRelation.getSchema(resolver, jdbcOptions)</span><br><span class="line">  &#x2F;&#x2F; 获取分区信息</span><br><span class="line">  val parts &#x3D; JDBCRelation.columnPartition(schema, resolver, timeZoneId, jdbcOptions)</span><br><span class="line">  JDBCRelation(schema, parts, jdbcOptions)(sqlContext.sparkSession)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3><span id="读取schema">读取schema</span></h3><p>先会获取mysql的schema信息，用于spark生成查询计划，在获取schema的时候，是通过<code>JdbcDialect</code> 的<code>getSchemaQuery</code> 函数，如下:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">def getSchemaQuery(table: String): String &#x3D; &#123;</span><br><span class="line">  s&quot;SELECT * FROM $table WHERE 1&#x3D;0&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>而这里的<code>$table</code>是从配置中的<code>options.tableOrQuery</code>获取的，生成方式如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">val tableOrQuery &#x3D; (parameters.get(JDBC_TABLE_NAME), parameters.get(JDBC_QUERY_STRING)) match &#123;</span><br><span class="line">  &#x2F;&#x2F; dbtable 参数和 query 参数都设置的情况</span><br><span class="line">  case (Some(name), Some(subquery)) &#x3D;&gt;</span><br><span class="line">    throw new IllegalArgumentException(</span><br><span class="line">      s&quot;Both &#39;$JDBC_TABLE_NAME&#39; and &#39;$JDBC_QUERY_STRING&#39; can not be specified at the same time.&quot;</span><br><span class="line">    )</span><br><span class="line">  &#x2F;&#x2F; dbtable 参数和 query 参数都不存在的情况</span><br><span class="line">  case (None, None) &#x3D;&gt;</span><br><span class="line">    throw new IllegalArgumentException(</span><br><span class="line">      s&quot;Option &#39;$JDBC_TABLE_NAME&#39; or &#39;$JDBC_QUERY_STRING&#39; is required.&quot;</span><br><span class="line">    )</span><br><span class="line">  &#x2F;&#x2F; 只有dbtable 参数</span><br><span class="line">  case (Some(name), None) &#x3D;&gt;</span><br><span class="line">    if (name.isEmpty) &#123;</span><br><span class="line">      throw new IllegalArgumentException(s&quot;Option &#39;$JDBC_TABLE_NAME&#39; can not be empty.&quot;)</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      name.trim</span><br><span class="line">    &#125;</span><br><span class="line">  &#x2F;&#x2F; 只有query参数</span><br><span class="line">  case (None, Some(subquery)) &#x3D;&gt;</span><br><span class="line">    if (subquery.isEmpty) &#123;</span><br><span class="line">      throw new IllegalArgumentException(s&quot;Option &#96;$JDBC_QUERY_STRING&#96; can not be empty.&quot;)</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      s&quot;($&#123;subquery&#125;) SPARK_GEN_SUBQ_$&#123;curId.getAndIncrement()&#125;&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>spark jdbc在配置时候可以有query和dbtable两种配置，我测试中使用的是query配置，因此这里生成的<code>getSchemaQuery</code>实际上是一个子查询，完整的sql如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SELECT * FROM (SELECT id, mid, value, created, started, st_id, pc FROM test_aaa) SPARK_GEN_SUBQ_0 WHERE 1&#x3D;0</span><br></pre></td></tr></table></figure>
+
+<p>这个子查询会在mysql内部生成一个临时表，由于<code>test_aaa</code>表数据量很大而且有<code>longtext</code>字段，所以使用了磁盘临时表的方案，这样就会引起大量写盘的操作，所以导致了io突升</p>
+<h3><span id="读取数据">读取数据</span></h3><p>继续查看spark在读取数据的时候，走的是<code>JDBCRDD.compute</code> 方法，其中生成的sql为</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">val sqlText &#x3D; s&quot;SELECT $columnList FROM $&#123;options.tableOrQuery&#125; $myWhereClause&quot;</span><br></pre></td></tr></table></figure>
+
+<p>这个也是一个子查询的形式，所以对于大表也会有上面的问题。</p>
+<h2><span id="sqoop-读取mysql原理">sqoop 读取mysql原理</span></h2><p>为啥<a href="https://sqoop.apache.org/">sqoop</a>很平稳呢，看了下sqoop源码，可以参考<a href="https://wujun234.com/post/Sqoop-yuan-ma-cong-MySQL-dao-ru-dao-Hive/">sqoop源码-mysql2hive</a>，查看发现sqoop在配置是query时候，必须包含<code>$CONDITIONS</code>这个标识，</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">If you want to import the results of a query in parallel, then each map task will need to execute a copy of the query, with results partitioned by bounding conditions inferred by Sqoop. Your query must include the token &#96;$CONDITIONS&#96; which each Sqoop process will replace with a unique condition expression. You must also select a splitting column with &#96;--split-by&#96;.</span><br></pre></td></tr></table></figure>
+
+<h3><span id="读取schema">读取schema</span></h3><p>在读取schema的时候，会把<code>$CONDITIONS</code>进行替换，从而避免了子查询，这个在 <code>SqlManager.getColumnTypesForQuery()</code> 方法中，如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public Map&lt;String, Integer&gt; getColumnTypesForQuery(String query) &#123;</span><br><span class="line">   &#x2F;&#x2F; Manipulate the query to return immediately, with zero rows.</span><br><span class="line">   String rawQuery &#x3D; query.replace(SUBSTITUTE_TOKEN, &quot; (1 &#x3D; 0) &quot;);</span><br><span class="line">   return getColumnTypesForRawQuery(rawQuery);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，这是将<code>$CONDITIONS</code>替换为了<code>(1 = 0)</code>，这样就不用走子查询</p>
+<h3><span id="读取数据">读取数据</span></h3><p>在读取数据的时候也是如此，对<code>$CONDITIONS</code>进行替换，详见<code>DataDrivenDBRecordReader.getSelectQuery()</code> 方法，这儿不再赘述。</p>
+<h2><span id="seatunnel-jdbc原理">seatunnel jdbc原理</span></h2><p>另外看了下最近比较火的数据同步工具<a href="https://seatunnel.apache.org/">seatunnel</a></p>
+<h3><span id="读取schema">读取schema</span></h3><p>发现其在获取schema的时候在<code>JdbcDialect.getResultSetMetaData()</code>方法中</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">default ResultSetMetaData getResultSetMetaData(</span><br><span class="line">        Connection conn, JdbcSourceConfig jdbcSourceConfig) throws SQLException &#123;</span><br><span class="line">    PreparedStatement ps &#x3D; conn.prepareStatement(jdbcSourceConfig.getQuery());</span><br><span class="line">    return ps.getMetaData();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这儿需要注意的是，它采用的是<code>PreparedStatement.getMetaData()</code>来获取查询结果的schema，而sqoop和spark其实是构造一个空查询，然后走的<code>ResultSet.getMetaData()</code>，也就是<code>PreparedStatement.executeQuery()</code>之后得到的<code>ResultSet</code>。我看网上说<code>PreparedStatement.getMetaData()</code> 好像更好，但是mysql对这个支持不太好，我感觉差别应该不大。</p>
+<h3><span id="读取数据">读取数据</span></h3><p>如果partition字段没有设置的话，会直接使用传入的<code>query</code></p>
+<p>如果设置了partition字段的话，会使用子查询的方式，见<code>JdbcSourceFactory.obtainPartitionSql()</code></p>
+<h2><span id="解决思路">解决思路</span></h2><p>对于spark，我们可以参考sqoop的方式，设置一个<code>$CONDITIONS</code>标识将其进行替换，从而绕开子查询，这样避免数据库的io上升</p>
+<p>具体地，就是去改写<code>JDBCRDD</code> 以及<code>JdbcDialect</code>两个类就可以绕开</p>
+<p>这儿还需要注意一个问题是spark在生成物理执行计划的时候，select columnList 的顺序和之前<code>getSchema</code>获取到的顺序是不一样的，主要原因是它将schema的字段类型存放在了一个set中去用于算子之间传输序列化，而set的顺序就和之前schema的顺序不同了，必须按照这个columnList 的顺序去数据库里读取数据才可以</p>
+<p>至于为什么不参考seatunnel的方法，因为它还是存在子查询，在有partition字段的时候还是会有问题</p>
+<h2><span id="总结">总结</span></h2><p>可以看到，虽然sqoop是一个很老的项目，而且目前已经停止维护了，但是之前在发展的过程中，针对mysql读取还是做了很多调优的</p>
+<p>另外，我之前以为的sqoop效率不高是因为它是mr任务，而spark是内存计算，实际测试下来，两者速度差不多，与mr没太大关系，因为这种etl 任务只有一个map阶段，无法发挥出spark内存计算的优势，spark可以做到不比sqoop慢，但是也快不了多少，好处是与hive表的兼容性更好一些</p>
+]]></content>
+      <tags>
+        <tag>数据同步</tag>
+        <tag>spark</tag>
       </tags>
   </entry>
 </search>
