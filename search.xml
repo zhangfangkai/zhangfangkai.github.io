@@ -195,6 +195,9 @@
 </li>
 </ul>
 ]]></content>
+      <categories>
+        <category>大数据</category>
+      </categories>
       <tags>
         <tag>hive</tag>
         <tag>json</tag>

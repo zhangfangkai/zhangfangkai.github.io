@@ -6,7 +6,7 @@
   <link href="https://blog.eightbrother.top/atom.xml" rel="self"/>
   
   <link href="https://blog.eightbrother.top/"/>
-  <updated>2023-10-23T15:09:54.364Z</updated>
+  <updated>2023-10-23T15:11:35.689Z</updated>
   <id>https://blog.eightbrother.top/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="https://blog.eightbrother.top/p/e836dffa.html"/>
     <id>https://blog.eightbrother.top/p/e836dffa.html</id>
     <published>2023-10-23T15:08:37.000Z</published>
-    <updated>2023-10-23T15:09:54.364Z</updated>
+    <updated>2023-10-23T15:11:35.689Z</updated>
     
     <content type="html"><![CDATA[<h2><span id="背景">背景</span></h2><p>最近在做一批埋点数据flink落hive表的改造，原来这批入库的hive表都是json格式的，很占空间，查询效率也很低，想将其改成parquet格式，降低存储，提高查询效率。在对比数据的时候发现，对于map字段中的key，两边大小写不一致，具体表现为：</p><ul><li><p>json表用spark查询时，对于map字段，key都是小写，比如实际上报{“userId”:111}，查询出的结果为{“userid”:111}</p></li><li><p>parquet表用spark查询时，对于map字段，key和实际上报数据都是一致的，都为{“userId”:111}</p></li></ul><h2><span id="排查">排查</span></h2><p>hive表的格式为 <code>ROW FORMAT SERDE &#39;org.openx.data.jsonserde.JsonSerDe&#39;</code></p><p>他会使用<a href="https://github.com/rcongiu/Hive-JSON-Serde">Hive-JSON-Serde</a> 去解析，具体获取key的时候会使用<code>org.openx.data.jsonserde.json.JSONObject</code>这个类中的<code>getKey()</code>方法，这里面会默认转成小写，如下</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">private String getKey(String key) &#123;</span><br><span class="line">if(JSONOptions.globalOptions.isCaseInsensitive) &#123;</span><br><span class="line">return key.toLowerCase();</span><br><span class="line">&#125; else &#123;</span><br><span class="line">return key;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>其实对于json的解析还有另一种方式 <code>org.apache.hive.hcatalog.data.JsonSerDe&#39;</code> 将hive表的<code>ROW FORMAT SERDE</code>改为这种方式之后查询的数据是有大写key的，但是这种方式的问题在于查询的时候如果遇到错误的json数据，会直接报错退出，而 <code>org.openx.data.jsonserde.JsonSerDe</code> 会忽略错误，所以在实际使用中用后者居多，不过后者存在key转小写的问题</p><h2><span id="解决">解决</span></h2><p>由于历史的数据都是用<code>org.openx.data.jsonserde.JsonSerDe</code> 解析，下游都有很多任务，所以最后的解决方案是在写入parquet的时候将map类型的key全部转为小写</p><h2><span id="总结">总结</span></h2><ul><li><p>JSON格式的hive表查询的时候有坑，需要注意</p></li><li><p>大数据最好使用下划线命名，禁止驼峰命名，会减少很多问题</p></li><li><p>正确的不一定是可行的，虽然和实际上报数据保持一致是正确的选择，但是为了兼容历史，我们只能让它继续错下去</p></li></ul>]]></content>
     
@@ -32,6 +32,8 @@
       
     
     
+    
+    <category term="大数据" scheme="https://blog.eightbrother.top/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/"/>
     
     
     <category term="hive" scheme="https://blog.eightbrother.top/tags/hive/"/>
